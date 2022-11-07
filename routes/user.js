@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-11-01 16:15:19
+ * @LastEditTime: 2022-11-07 13:29:10
  */
 var express = require('express');
 var router = express.Router();
@@ -19,13 +19,22 @@ const verifyUser = (req, res) =>{
     }
     return !username || !password;
 }
-
+router.get('/test', function(req, res, next) {
+    console.log('请求::', req.body);
+    res.send({
+        code: 1,
+        resbody: {
+            a: 'test2'
+        },
+        message: '测试成功！'
+    })
+});
 //注册
 router.post('/register', function(req, res, next) {
     let { username, password, age } = req.body;
     if(!verifyUser(req, res)){
         UserModel.findOne({ username })
-        .then(user =>{
+        .then(user => {
             if(!user){
                 new UserModel({ username, password, age })
                 .save((err, newUser)=>{

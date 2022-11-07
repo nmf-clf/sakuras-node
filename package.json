@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "env PORT=3005 node-dev ./bin/www"
+    "start": "env PORT=5555 dbPath=pro ENV=pro node-dev ./bin/www",
+    "start-dev": "env PORT=5555 dbPath=dev ENV=dev node-dev ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -13,5 +14,12 @@
     "http-errors": "~1.6.3",
     "mongoose": "^6.7.0",
     "morgan": "~1.9.1"
+  },
+  "runDBPath": {
+    "dev": "127.0.0.1:27017/sakuras",
+    "pro": "124.223.5.128:27017/sakuras"
+  },
+  "devDependencies": {
+    "colors": "^1.4.0"
   }
 }

@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-10-31 17:46:09
+ * @LastEditTime: 2022-11-07 17:40:51
  */
 var createError = require('http-errors');
 var express = require('express');
@@ -27,11 +27,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/user', usersRouter);
+app.use('/sakuras-api', indexRouter);
+app.use('/sakuras-api/user', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
+  console.log('出错啦:::', req.url);
   next(createError(404));
 });
 

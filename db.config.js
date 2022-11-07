@@ -2,11 +2,17 @@
  * @Author: niumengfei
  * @Date: 2022-10-28 16:47:36
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-10-31 17:43:11
+ * @LastEditTime: 2022-11-05 14:30:51
  */
 const mongoose = require('mongoose'); //数据库
-//启动数据库
-mongoose.connect('mongodb://localhost:27017/sakuras'); //插入集合和数据，数据库会自动创建
+require('colors');// 颜色模块
+
+const pk_config = require('./package.json');
+const dbPath = pk_config.runDBPath[process.env.dbPath || 'pro']; //默认连接服务器数据库
+
+//启动数据库 插入集合和数据，数据库会自动创建
+// mongoose.connect('mongodb://127.0.0.1:27017/sakuras'); //本地数据库
+mongoose.connect(`mongodb://${dbPath}`); //通过本地连接远程数据库
 
 const db = mongoose.connection;
 
@@ -15,5 +21,5 @@ db.on('error',(err)=>{
 });
 
 db.once('open',()=>{ 
-	console.log('DB connected....');
+	console.log(`DB is connected on ${dbPath}...`.green);
 });
