@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-11-07 17:40:51
+ * @LastEditTime: 2022-12-16 17:35:12
  */
 var createError = require('http-errors');
 var express = require('express');
@@ -11,7 +11,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/user');
+var userRouter = require('./routes/user');
+var articleRouter = require('./routes/article');
 
 require('./db.config'); //启动数据库
 
@@ -28,7 +29,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/sakuras-api', indexRouter);
-app.use('/sakuras-api/user', usersRouter);
+app.use('/sakuras-api/user', userRouter);
+app.use('/sakuras-api/article', articleRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
