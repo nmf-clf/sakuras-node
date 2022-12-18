@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-12-17 18:46:48
+ * @LastEditTime: 2022-12-18 22:38:28
  */
 var express = require('express');
 var router = express.Router();
@@ -13,7 +13,7 @@ const pagination = require('../utils/pagination');
 router.get('/addArticleList', function(req, res, next) {
     // let { username, password, age } = req.body;
     const item = {
-        idNo: 1,
+        uuid: Math.round(Math.random()*10000),
         title: '如何赚钱',
         type: '文学著作',
         content: '查看刑法第N条',
@@ -22,18 +22,14 @@ router.get('/addArticleList', function(req, res, next) {
         status: '已发布',
         opreation: `<div>123</div>`
     };
-    let arr = Array.from({ length: 37 }).fill(item).map((v,i)=>{
-        return { ...v, idNo: i+1 }
-    })
-   
-    new ArticleModel({ username: 'admin', articleList: arr })
-    .save((err, newArticle)=>{
-        if (err) return console.error(err);
-        console.log('newArticle>>', newArticle);
+    new ArticleModel({ username: 'test', ...item })
+    .save((err, result)=>{
+        if (err) return console.error('出错啦::', err);
+        console.log('result>>', result);
         res.send({
             code: '1',
-            data: newArticle || {},
-            message: '注册成功！'
+            data: result || {},
+            message: '新增文章成功！'
         });
     })
 });
@@ -50,7 +46,7 @@ router.get('/list', function(req, res, next) {
                 username
             }, //查询条件
             projection: '', //投影，
-            sort: {_id:-1} //排序
+            // sort: {_id:-1} //排序
         }
         pagination(options)
         .then((result)=>{
