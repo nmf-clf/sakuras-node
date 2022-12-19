@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-12-17 17:11:34
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-12-17 18:44:06
+ * @LastEditTime: 2022-12-19 16:02:59
  */
 /*
 options = {
@@ -16,7 +16,7 @@ options = {
 */
 
 let pagination = (options)=>{
-
+	console.log('options::', options);
 	return new Promise((resolve,reject)=>{
 		//需要显示的页码
 		
@@ -49,17 +49,20 @@ let pagination = (options)=>{
 
 		options.model.countDocuments(options.query)
 		.then((count)=>{
-			let pages = Math.ceil(count / limit);
-			if(page > pages){
-				page = pages;
-			}
+			console.log('count::', count); // 查询总条数
+			// Math.ceil(X) 返回大于等于X的最小整数，即向上取整
+			let pages = Math.ceil(count / limit); // 也就是说假设一共47条，大于等于4.7的最小整数就是 5 ， 也就是一共有5页
+			console.log('最大页数::', pages, '当前页数::', page);
+			// if(page > pages){
+			// 	page = pages;
+			// }
 			if(pages == 0){
 				page = 1;
 			}
 
 			let skip = (page - 1)*limit;
-
-			let query = options.model.find(options.query,options.projection);
+			console.log('跳过多少条::', skip);
+			let query = options.model.find(options.query, options.projection);
 			
 			if(options.populate){
 				for(let i = 0;i<options.populate.length;i++){
@@ -73,10 +76,10 @@ let pagination = (options)=>{
 			.limit(limit)
 			.then((docs)=>{
 				resolve({
-					list:docs,
-					current:page*1,
-					pageSize:limit,
-					total:count
+					list: docs,
+					current: page * 1,
+					pageSize: limit,
+					total: count
 				})		
 			})
 		})

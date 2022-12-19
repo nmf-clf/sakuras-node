@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-12-18 22:38:28
+ * @LastEditTime: 2022-12-19 14:44:56
  */
 var express = require('express');
 var router = express.Router();
@@ -50,7 +50,7 @@ router.get('/list', function(req, res, next) {
         }
         pagination(options)
         .then((result)=>{
-            console.log('result::', result);
+            // console.log('result::', result);
             res.send({
                 code: '1',
                 data: result,
