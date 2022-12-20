@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-12-19 14:44:56
+ * @LastEditTime: 2022-12-20 10:51:57
  */
 var express = require('express');
 var router = express.Router();
@@ -34,8 +34,9 @@ router.get('/addArticleList', function(req, res, next) {
     })
 });
 //查询文章
-router.get('/list', function(req, res, next) {
-    let { username, page=1, pageSize=10 } = req.query;
+router.post('/list', function(req, res, next) {
+    // let { username, page=1, pageSize=10 } = req.query;
+    let { username, page=1, pageSize=10 } = req.body;
     if(username){
         //查询该用户
         let options = {
