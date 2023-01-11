@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "env PORT=5555 dbPath=pro ENV=pro node-dev ./bin/www",
-    "start-dev": "env PORT=5555 dbPath=dev ENV=dev node-dev ./bin/www"
+    "start:dev": "env PORT=5555 dbPath=dev ENV=dev node-dev ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

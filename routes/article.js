@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-12-20 10:51:57
+ * @LastEditTime: 2022-12-30 09:37:09
  */
 var express = require('express');
 var router = express.Router();
@@ -22,7 +22,7 @@ router.get('/addArticleList', function(req, res, next) {
         status: '已发布',
         opreation: `<div>123</div>`
     };
-    new ArticleModel({ username: 'test', ...item })
+    new ArticleModel({ username: 'admin', ...item })
     .save((err, result)=>{
         if (err) return console.error('出错啦::', err);
         console.log('result>>', result);
