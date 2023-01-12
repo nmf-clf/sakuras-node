@@ -1,8 +1,8 @@
 /*
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
- * @LastEditors: niumengfei
- * @LastEditTime: 2022-12-16 17:35:12
+ * @LastEditors: niumengfei 870424431@qq.com
+ * @LastEditTime: 2023-01-12 10:11:44
  */
 var createError = require('http-errors');
 var express = require('express');
@@ -34,7 +34,7 @@ app.use('/sakuras-api/article', articleRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  console.log('出错啦:::', req.url);
+  console.log('出错啦(404):::', req.url);
   next(createError(404));
 });
 
