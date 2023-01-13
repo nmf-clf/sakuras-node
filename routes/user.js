@@ -2,14 +2,27 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2022-11-07 13:29:10
+ * @LastEditTime: 2023-01-13 17:35:52
  */
 var express = require('express');
 var router = express.Router();
 const UserModel = require('../models/User.js');
+const Utils = require('../utils/Utils');
 
 const verifyUser = (req, res) =>{
-    let { username, password } = req.body;
+    let { sid } = req.headers;
+    let { params } = req.body;
+    let _pms;
+    try{
+        _pms = JSON.parse(Utils.decrypt.DynamicDES(params, sid.split("").reverse().join("")));
+    }catch(err){
+        res.send({
+            code: '0',
+            data: null,
+            message: '登录信息验证失败！'
+        })
+    }
+    let { username, password } = _pms;
     if(!username || !password){
         res.send({
             code: '0',
@@ -62,7 +75,10 @@ router.post('/register', function(req, res, next) {
 
 //登录
 router.post('/login', function(req, res, next) {
-    let { username, password } = req.body;
+    let { sid } = req.headers;
+    let { params } = req.body;
+    let _pms = JSON.parse(Utils.decrypt.DynamicDES(params, sid.split("").reverse().join("")));
+    let { username, password } = _pms;
     if(!verifyUser(req, res)){
         UserModel.findOne({ username, password })
         .then(user =>{

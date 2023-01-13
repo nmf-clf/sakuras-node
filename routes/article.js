@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei 870424431@qq.com
- * @LastEditTime: 2023-01-12 14:15:10
+ * @LastEditTime: 2023-01-13 11:38:43
  */
 var express = require('express');
 var router = express.Router();
@@ -87,6 +87,28 @@ router.post('/detail', function(req, res, next) {
             data: article || {},
             message: article ? '查询成功！' : '文章详情暂无数据！'
         })
+    })
+});
+
+// 查询文章详情
+router.post('/add', function(req, res, next) {
+    let { username, title, content } = req.body;
+    if(!username || !title){
+        res.send({
+            code: '0',
+            data: null,
+            message: '新增失败，username和title不能为空！'
+        })
+    }
+    new ArticleModel({ username, title, content })
+    .save((err, result)=>{
+        if (err) return console.error('出错啦::', err);
+        console.log('result>>', result);
+        res.send({
+            code: '1',
+            data: result || {},
+            message: '新增文章成功！'
+        });
     })
 });
 
