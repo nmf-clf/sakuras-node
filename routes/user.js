@@ -2,13 +2,14 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-01-13 17:35:52
+ * @LastEditTime: 2023-01-16 17:33:15
  */
 var express = require('express');
 var router = express.Router();
 const UserModel = require('../models/User.js');
 const Utils = require('../utils/Utils');
 
+// 校验必填项
 const verifyUser = (req, res) =>{
     let { sid } = req.headers;
     let { params } = req.body;
@@ -32,17 +33,8 @@ const verifyUser = (req, res) =>{
     }
     return !username || !password;
 }
-router.get('/test', function(req, res, next) {
-    console.log('请求::', req.body);
-    res.send({
-        code: 1,
-        resbody: {
-            a: 'test2'
-        },
-        message: '测试成功！'
-    })
-});
-//注册
+
+// 注册
 router.post('/register', function(req, res, next) {
     let { username, password, age } = req.body;
     if(!verifyUser(req, res)){
@@ -73,7 +65,7 @@ router.post('/register', function(req, res, next) {
     }
 });
 
-//登录
+// 登录
 router.post('/login', function(req, res, next) {
     let { sid } = req.headers;
     let { params } = req.body;
@@ -87,8 +79,7 @@ router.post('/login', function(req, res, next) {
                     code: '1',
                     data: {
                         name: username,
-                        ps: password,
-                        token: 'asdasdwqeqweqweqweqeeqw'
+                        token: 'test-----------token'
                     },
                     message: '登录成功'
                 })

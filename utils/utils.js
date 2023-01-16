@@ -2,11 +2,13 @@
  * @Author: niumengfei
  * @Date: 2022-10-29 14:04:02
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-01-13 17:25:25
+ * @LastEditTime: 2023-01-16 14:29:44
  */
 // const JSEncrypt = require('jsencrypt');
 // console.log('JSEncrypt::', JSEncrypt);
 const CryptoJS = require("crypto-js");
+const moment = require("moment");
+
 let DynamicKey;
 // 公共方法
 class _Utils{
@@ -52,7 +54,14 @@ class _Utils{
             },
         }
     }
-   
+    moment = () => {
+        return {
+            // 获取当前日期
+            currentDate: (type) => {
+                return type ? moment().format(type) : moment().format('YYYY-MM-DD');
+            }
+        }
+    }
 }
 
 // export default new Utils();
