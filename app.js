@@ -1,18 +1,14 @@
 /*
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
- * @LastEditors: niumengfei 870424431@qq.com
- * @LastEditTime: 2023-01-12 10:11:44
+ * @LastEditors: niumengfei
+ * @LastEditTime: 2023-02-07 16:24:54
  */
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var userRouter = require('./routes/user');
-var articleRouter = require('./routes/article');
 
 require('./db.config'); //启动数据库
 
@@ -28,9 +24,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/sakuras-api', indexRouter);
-app.use('/sakuras-api/user', userRouter);
-app.use('/sakuras-api/article', articleRouter);
+app.use('/sakuras-api', require('./routes/index'));
+app.use('/sakuras-api/user', require('./routes/user'));
+app.use('/sakuras-api/article', require('./routes/article'));
+app.use('/sakuras-api/dictionary', require('./routes/dictionary'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

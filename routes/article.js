@@ -2,16 +2,17 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-01-16 17:45:01
+ * @LastEditTime: 2023-02-09 17:50:04
  */
 var express = require('express');
 var router = express.Router();
 const ArticleModel = require('../models/Article');
+const UserModel = require('../models/User');
 const { Utils, pagination } = require('../utils');
  
 // 查询文章列表
 router.post('/list', function(req, res, next) {
-    let { username, page = 1, pageSize = 10 } = req.body;
+    let { username, page=1, pageSize=10, title, type, tag, createDate=[], updateDate=[], status } = req.body;
     if(!username){
         return res.send({
             code: '0',
@@ -25,7 +26,13 @@ router.post('/list', function(req, res, next) {
         limit: pageSize,
         model: ArticleModel, //操作的数据模型
         query: {
-            username
+            username, 
+            title, 
+            type: type == '全部' ? '' : type, 
+            status: status == '全部' ? '' : status,
+            tag, 
+            createDate: Utils.isEmpty(createDate) ? null : { "$gte": createDate[0], "$lte": createDate[1] },
+            updateDate: Utils.isEmpty(updateDate) ? null : { "$gte": updateDate[0], "$lte": updateDate[1] },
         }, //查询条件
         projection: '', //投影，
         sort: { _id: -1 } //排序
@@ -52,17 +59,23 @@ router.post('/detail', function(req, res, next) {
     }
     ArticleModel.findOne({ _id })
     .then(article =>{
-        res.send({
-            code: '1',
-            data: article || {},
-            message: article ? '查询成功！' : '文章详情暂无数据！'
+        UserModel.findOne({ username: article.username })
+        .then(user =>{
+            res.send({
+                code: '1',
+                data: {
+                    ...article._doc,
+                    nickname: user.nickname
+                } || {},
+                message: article ? '查询成功！' : '文章详情暂无数据！'
+            })
         })
     })
 });
 
 // 新增文章
 router.post('/addOrUpdate', function(req, res, next) {
-    let {  username, title, type, content, status, _id } = req.body;
+    let { _id, username, title, type, content, status='已发布', tag=[], hot=0, good=0 } = req.body;
     const currentDate = Utils.moment().currentDate();
     if(!username || !title){
         return res.send({
@@ -80,6 +93,9 @@ router.post('/addOrUpdate', function(req, res, next) {
             createDate: currentDate, 
             updateDate: currentDate, 
             status,
+            tag,
+            hot,
+            good,
         })
         .save((err, result)=>{
             if (err) return console.error('出错啦::', err);
@@ -96,6 +112,9 @@ router.post('/addOrUpdate', function(req, res, next) {
             content, 
             updateDate: currentDate, 
             status,
+            tag,
+            hot,
+            good,
         }}, { new: true }, function(err, updateArticle){
             if (err) return console.error('出错啦::', err);
             res.send({

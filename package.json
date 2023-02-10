@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "env PORT=5555 dbPath=pro ENV=pro node-dev ./bin/www",
-    "start:local-db": "env PORT=5555 dbPath=dev ENV=dev node-dev ./bin/www"
+    "start:sakuras": "env PORT=5555 dbPath=pro ENV=pro node-dev ./bin/www",
+    "start:local": "env PORT=5555 dbPath=dev ENV=dev node-dev ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

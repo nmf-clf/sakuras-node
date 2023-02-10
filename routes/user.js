@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-01-16 17:33:15
+ * @LastEditTime: 2023-02-02 17:03:19
  */
 var express = require('express');
 var router = express.Router();
@@ -36,21 +36,20 @@ const verifyUser = (req, res) =>{
 
 // 注册
 router.post('/register', function(req, res, next) {
-    let { username, password, age } = req.body;
+    let { sid } = req.headers;
+    let { params } = req.body;
+    let _pms = JSON.parse(Utils.decrypt.DynamicDES(params, sid.split("").reverse().join("")));
+    let { username, password, age, nickname, emai, adress, school, schedule } = _pms;
     if(!verifyUser(req, res)){
         UserModel.findOne({ username })
         .then(user => {
             if(!user){
-                new UserModel({ username, password, age })
+                new UserModel({ username, password, age, nickname, emai, adress, school, schedule })
                 .save((err, newUser)=>{
                     if (err) return console.error(err);
                     res.send({
                         code: '1',
-                        data: {
-                            name: username,
-                            ps: password,
-                            token: 'asdasdwqeqweqweqweqeeqw'
-                        },
+                        data: {},
                         message: '注册成功！'
                     });
                 })
@@ -75,10 +74,11 @@ router.post('/login', function(req, res, next) {
         UserModel.findOne({ username, password })
         .then(user =>{
             if(user){
+                const { username, password, age, nickname, emai, adress, school, schedule } = user;
                 res.send({
                     code: '1',
                     data: {
-                        name: username,
+                        username, password, age, nickname, emai, adress, school, schedule,
                         token: 'test-----------token'
                     },
                     message: '登录成功'
@@ -93,5 +93,7 @@ router.post('/login', function(req, res, next) {
         })
     }
 });
+
+// 添加待办事项
 
 module.exports = router;
