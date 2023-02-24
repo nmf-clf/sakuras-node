@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-28 17:29:24
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-09 17:11:38
+ * @LastEditTime: 2023-02-14 14:09:54
  */
 const mongoose = require('mongoose');
 
@@ -17,6 +17,7 @@ const Article = new mongoose.Schema({
     tag: Array, // 标签
     hot: Number, // 热度
     good: Number, // 点赞
+    index: Number, // 排序
 });
 
 const ArticleModel = mongoose.model('Article', Article);

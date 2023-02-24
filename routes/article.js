@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-09 17:50:04
+ * @LastEditTime: 2023-02-24 16:19:28
  */
 var express = require('express');
 var router = express.Router();
@@ -12,7 +12,7 @@ const { Utils, pagination } = require('../utils');
  
 // 查询文章列表
 router.post('/list', function(req, res, next) {
-    let { username, page=1, pageSize=10, title, type, tag, createDate=[], updateDate=[], status } = req.body;
+    let { username, page=1, pageSize=10, title, type, tag, createDate=[], updateDate=[], status, sortByIndex } = req.body;
     if(!username){
         return res.send({
             code: '0',
@@ -39,9 +39,15 @@ router.post('/list', function(req, res, next) {
     }
     pagination(options)
     .then((result)=>{
+        let _res = result;
+        if(sortByIndex || (type && type !== '全部')){
+            let rlt = JSON.parse(JSON.stringify({result}));
+            rlt?.result?.list?.sort((a,b)=> a.index - b.index);
+            _res = rlt.result;
+        }
         res.send({
             code: '1',
-            data: result,
+            data: _res,
             message: '查询成功！'
         })
     })
@@ -75,13 +81,13 @@ router.post('/detail', function(req, res, next) {
 
 // 新增文章
 router.post('/addOrUpdate', function(req, res, next) {
-    let { _id, username, title, type, content, status='已发布', tag=[], hot=0, good=0 } = req.body;
+    let { _id, username, title, type, content, status='已发布', tag=[], hot=0, good=0, index } = req.body;
     const currentDate = Utils.moment().currentDate();
-    if(!username || !title){
+    if(!_id && (!username || !title)){
         return res.send({
             code: '0',
             data: null,
-            message: '新增失败: username 和 title 不能为空!'
+            message: '新增失败: username / title 不能为空!'
         })
     }
     if(!_id){ // 新增
@@ -96,6 +102,7 @@ router.post('/addOrUpdate', function(req, res, next) {
             tag,
             hot,
             good,
+            index,
         })
         .save((err, result)=>{
             if (err) return console.error('出错啦::', err);
@@ -146,6 +153,39 @@ router.post('/delete', function(req, res, next) {
     })
     .catch(err =>{
         console.error('出错啦::', err);
+    })
+});
+
+// 重置Index值
+router.post('/resetIndex', function(req, res, next) {
+    let {  newChildrenIdList=[] } = req.body;
+    let ln = newChildrenIdList.length;
+    let sign = 0;
+    new Promise((resolve, reject)=> {
+        newChildrenIdList.map((_id, _index) => {
+            ArticleModel.findByIdAndUpdate(_id, { $set: { 
+                index: _index + 1
+            }}, { new: true }, function(err){
+                if(err){
+                    res.send({
+                        code: '0',
+                        data: {},
+                        message: `${_id} 更新失败！`
+                    });
+                }
+                sign = sign + 1;
+                if(sign === ln){
+                    resolve();
+                }
+            });
+        })
+    })
+    .then(()=> {
+        res.send({
+            code: '1',
+            data: {},
+            message: '文章排序成功！'
+        });
     })
 });
 

@@ -2,22 +2,21 @@
  * @Author: niumengfei
  * @Date: 2022-10-29 14:04:02
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-10 17:54:49
+ * @LastEditTime: 2023-02-24 16:18:20
  */
-// const JSEncrypt = require('jsencrypt');
-// console.log('JSEncrypt::', JSEncrypt);
+const NodeRSA = require('node-rsa');
 const CryptoJS = require("crypto-js");
 const moment = require("moment");
+const { RSAPrivatecKey } = require('./Const');
 
 let DynamicKey;
+
 // 公共方法
 class _Utils{
     
     constructor() {
-        // 加密
-        this.encrypt = {
-            // 动态DES
-            DynamicDES: (message) => { 
+        this.encrypt = { // 加密
+            DynamicDES: (message, DynamicKey) => { // 动态DES
                 var keyHex = CryptoJS.enc.Utf8.parse(DynamicKey);
                 var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
                     mode: CryptoJS.mode.ECB,
@@ -25,18 +24,17 @@ class _Utils{
                 });
                 return encrypted.ciphertext.toString();
             },
-            // RSA
-            RSA(Key24) {
-                // const encrypt = new JSEncrypt();
-                // encrypt.setPublicKey(RSAKey);
-                // const encrypted = encrypt.encrypt(Key24);
-                // return encrypted;
+            RSA(Key24) { // RSA
+                const RSAPublicKey = 'RSA-公钥';
+                const encrypt = new NodeRSA(RSAPublicKey);
+                encrypt.setOptions({encryptionScheme: 'pkcs1'}); // 因为jsencrypt自身使用的是pkcs1加密方案, nodejs需要修改成pkcs1。
+                const encrypted = encrypt.encrypt(Key24, 'base64');
+                return encrypted;
             }
         }
         // 解密
         this.decrypt = {
             DynamicDES: (ciphertext, DynamicKey) => {
-                console.log('Des解密::', ciphertext, DynamicKey);
                 try{
                     var keyHex = CryptoJS.enc.Utf8.parse(DynamicKey);
         
@@ -52,6 +50,12 @@ class _Utils{
                     console.log('decryptByDES-err====================>',err)
                 }
             },
+            RSA(Key24) {
+                const privateKey = new NodeRSA(RSAPrivatecKey);
+                privateKey.setOptions({encryptionScheme: 'pkcs1'}); // 因为jsencrypt自身使用的是pkcs1加密方案, nodejs需要修改成pkcs1。
+                let decrypted = privateKey.decrypt(Key24, 'utf8');
+                return decrypted;
+            }
         }
     }
     moment = () => {

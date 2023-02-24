@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-02 17:03:19
+ * @LastEditTime: 2023-02-24 14:45:02
  */
 var express = require('express');
 var router = express.Router();
@@ -13,9 +13,10 @@ const Utils = require('../utils/Utils');
 const verifyUser = (req, res) =>{
     let { sid } = req.headers;
     let { params } = req.body;
+    let _sid = JSON.parse(Utils.decrypt.RSA(sid)); // 解密后的sid
     let _pms;
     try{
-        _pms = JSON.parse(Utils.decrypt.DynamicDES(params, sid.split("").reverse().join("")));
+        _pms = JSON.parse(Utils.decrypt.DynamicDES(params, _sid));
     }catch(err){
         res.send({
             code: '0',
@@ -31,16 +32,17 @@ const verifyUser = (req, res) =>{
             message: '账号和密码不能为空！'
         })
     }
-    return !username || !password;
+    return {
+        params: _pms,
+        sid: _sid,
+    };
 }
 
 // 注册
 router.post('/register', function(req, res, next) {
-    let { sid } = req.headers;
-    let { params } = req.body;
-    let _pms = JSON.parse(Utils.decrypt.DynamicDES(params, sid.split("").reverse().join("")));
-    let { username, password, age, nickname, emai, adress, school, schedule } = _pms;
-    if(!verifyUser(req, res)){
+    const verify = verifyUser(req, res);
+    if(verify){
+        const { params: { username, password, age, nickname, emai, adress, school, schedule } } = verify;
         UserModel.findOne({ username })
         .then(user => {
             if(!user){
@@ -66,21 +68,20 @@ router.post('/register', function(req, res, next) {
 
 // 登录
 router.post('/login', function(req, res, next) {
-    let { sid } = req.headers;
-    let { params } = req.body;
-    let _pms = JSON.parse(Utils.decrypt.DynamicDES(params, sid.split("").reverse().join("")));
-    let { username, password } = _pms;
-    if(!verifyUser(req, res)){
+    const verify = verifyUser(req, res);
+    if(verify){
+        const { params: { username, password }, sid } = verify;
         UserModel.findOne({ username, password })
         .then(user =>{
             if(user){
                 const { username, password, age, nickname, emai, adress, school, schedule } = user;
+                let encrypt = Utils.encrypt.DynamicDES(JSON.stringify({
+                    ...user._doc,
+                    token: 'test-----------token'
+                }), sid);
                 res.send({
                     code: '1',
-                    data: {
-                        username, password, age, nickname, emai, adress, school, schedule,
-                        token: 'test-----------token'
-                    },
+                    data: encrypt,
                     message: '登录成功'
                 })
             }else{
