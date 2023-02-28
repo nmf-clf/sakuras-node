@@ -2,21 +2,24 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-10 18:01:08
+ * @LastEditTime: 2023-02-28 16:56:55
  */
 var express = require('express');
 var router = express.Router();
 const DictionaryModel = require('../models/Dictionary');
+const ArticleModel = require('../models/Article')
 const { Utils, pagination } = require('../utils');
 
-// 查询字典
+// 查询字典-通用
 router.post('/list', function(req, res, next) {
+    const { userId } = req.body; 
+    let query = userId  ? { userId } : {}; // 如果传了 userId ，则表示只查询用户私有信息
     //查询该用户
     let options = {
         page: 1,
         limit: 1000,
         model: DictionaryModel,
-        query: {},
+        query,
         projection: '', 
     }
     pagination(options)
@@ -32,7 +35,7 @@ router.post('/list', function(req, res, next) {
 
 // 新增字典
 router.post('/addOrUpdate', function(req, res, next) {
-    let {  type, label, value, _id, pid, index, rename } = req.body;
+    let {  type, label, value, _id, pid, index, rename, userId } = req.body;
     if(!label || (!rename && _id && !type)){
         return res.send({
             code: '0',
@@ -46,7 +49,7 @@ router.post('/addOrUpdate', function(req, res, next) {
         })
         .then(count =>{
             console.log('count:::', count);
-            new DictionaryModel({ type, label, pid, value: value || label, index: count+1 })
+            new DictionaryModel({ type, label, pid, value: value || label, index: count+1, userId })
             .save((err, result)=>{
                 if (err) return console.error('出错啦::', err);
                 res.send({
@@ -83,10 +86,19 @@ router.post('/delete', function(req, res, next) {
     }
     DictionaryModel.findByIdAndDelete(_id)
     .then(delDictionary =>{
+        const { userId, label } = delDictionary;
         res.send({
             code: '1',
-            data: null,
+            data: delDictionary,
             message: '字典删除成功!'
+        })
+        // 如果删除的是文章相关的，则应该清空对应的分类的文章 这里应该使用关联查询
+        ArticleModel.deleteMany({
+            userId,
+            type: label,
+        })
+        .then(delArticles => {
+            console.log('xxxxx', delArticles);
         })
     })
     .catch(err =>{

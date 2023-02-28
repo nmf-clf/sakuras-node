@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-29 14:04:02
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-24 16:18:20
+ * @LastEditTime: 2023-02-28 11:04:13
  */
 const NodeRSA = require('node-rsa');
 const CryptoJS = require("crypto-js");
@@ -88,13 +88,14 @@ class _Utils{
         for (let j = 0; j < len; j++) {
             const jsonArrItem = jsonArr[j];
             const hashItem = hash[jsonArrItem[pid]]; 
-            if (hashItem) { 
+            if (hashItem) { // 子节点
                 !hashItem[children] && (hashItem[children] = []);
                 hashItem['children'].push(jsonArrItem);
                 hashItem['children'].sort((a,b)=>{
                     return a.index && b.index ? a.index - b.index : true
                 })
-            } else if(!jsonArrItem.pid){
+            } else if(!jsonArrItem.pid){ // 一级节点
+                jsonArrItem['children'] = [];
                 result.push(jsonArrItem);
                 result.sort((a,b)=>{
                     return a.index && b.index ? a.index - b.index : true

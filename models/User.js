@@ -2,11 +2,12 @@
  * @Author: niumengfei
  * @Date: 2022-10-28 17:29:24
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-02 16:53:40
+ * @LastEditTime: 2023-02-28 11:48:26
  */
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
+    isAdmin: Number, // 是否管理员 
     username: String, // 用户名
     nickname: String, // 昵称 
     password: String, // 密码

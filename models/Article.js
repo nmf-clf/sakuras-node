@@ -2,11 +2,12 @@
  * @Author: niumengfei
  * @Date: 2022-10-28 17:29:24
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-14 14:09:54
+ * @LastEditTime: 2023-02-28 14:43:19
  */
 const mongoose = require('mongoose');
 
 const Article = new mongoose.Schema({
+    userId: String, // 用户唯一 id
     username: String, // 用户名
     title: String, // 文章标题 
     type: String, // 文章类型 

@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-24 16:19:28
+ * @LastEditTime: 2023-02-28 14:46:38
  */
 var express = require('express');
 var router = express.Router();
@@ -40,7 +40,7 @@ router.post('/list', function(req, res, next) {
     pagination(options)
     .then((result)=>{
         let _res = result;
-        if(sortByIndex || (type && type !== '全部')){
+        if(sortByIndex || (type && type !== '全部')){ // 指定通过 index 或者 查询非全部数据时，要自动根据 index 排序
             let rlt = JSON.parse(JSON.stringify({result}));
             rlt?.result?.list?.sort((a,b)=> a.index - b.index);
             _res = rlt.result;
@@ -81,17 +81,18 @@ router.post('/detail', function(req, res, next) {
 
 // 新增文章
 router.post('/addOrUpdate', function(req, res, next) {
-    let { _id, username, title, type, content, status='已发布', tag=[], hot=0, good=0, index } = req.body;
+    let { _id, userId, username, title, type, content, status='已发布', tag=[], hot=0, good=0, index } = req.body;
     const currentDate = Utils.moment().currentDate();
-    if(!_id && (!username || !title)){
+    if(!_id && (!username || !title || !userId)){
         return res.send({
             code: '0',
             data: null,
-            message: '新增失败: username / title 不能为空!'
+            message: '新增失败: userId / username / title 不能为空!'
         })
     }
     if(!_id){ // 新增
         new ArticleModel({ 
+            userId,
             username, 
             title,  
             type,  
