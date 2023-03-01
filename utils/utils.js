@@ -2,12 +2,12 @@
  * @Author: niumengfei
  * @Date: 2022-10-29 14:04:02
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-28 11:04:13
+ * @LastEditTime: 2023-03-01 15:25:15
  */
 const NodeRSA = require('node-rsa');
 const CryptoJS = require("crypto-js");
 const moment = require("moment");
-const { RSAPrivatecKey } = require('./Const');
+const { RSAPrivatecKey, StaticKey } = require('./Const');
 
 let DynamicKey;
 
@@ -24,6 +24,14 @@ class _Utils{
                 });
                 return encrypted.ciphertext.toString();
             },
+            StaticDES: (message) =>{  // 静态DES 
+                var keyHex = CryptoJS.enc.Utf8.parse(StaticKey);
+                var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+                return encrypted.ciphertext.toString();
+            }, 
             RSA(Key24) { // RSA
                 const RSAPublicKey = 'RSA-公钥';
                 const encrypt = new NodeRSA(RSAPublicKey);
@@ -107,6 +115,19 @@ class _Utils{
     // 浅比较空值
     isEmpty(val){
         return !val || JSON.stringify(val) === '{}' || JSON.stringify(val) === '[]' || JSON.stringify(val) === 'null'
+    }
+    // 生成随机数
+     // 生成随机数 
+     randomString = (len, type) => {
+        len = len || 32;
+        let $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+        type == 'number' ? $chars = '1234567890' : null;
+        let maxPos = $chars.length;
+        let pwd = '';
+        for (let i = 0; i < len; i++) {
+            pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+        }
+        return pwd;
     }
 }
 

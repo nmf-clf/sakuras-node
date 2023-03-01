@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-28 16:56:55
+ * @LastEditTime: 2023-03-01 15:12:09
  */
 var express = require('express');
 var router = express.Router();
@@ -35,7 +35,7 @@ router.post('/list', function(req, res, next) {
 
 // 新增字典
 router.post('/addOrUpdate', function(req, res, next) {
-    let {  type, label, value, _id, pid, index, rename, userId } = req.body;
+    let {  type, label, _id, pid, rename, userId } = req.body;
     if(!label || (!rename && _id && !type)){
         return res.send({
             code: '0',
@@ -48,8 +48,7 @@ router.post('/addOrUpdate', function(req, res, next) {
             pid, // 通过pid查询 将要插入的对象 与之同级的 对象数量
         })
         .then(count =>{
-            console.log('count:::', count);
-            new DictionaryModel({ type, label, pid, value: value || label, index: count+1, userId })
+            new DictionaryModel({ type, label, pid, value: Utils.randomString(8, 'number'), index: count + 1, userId })
             .save((err, result)=>{
                 if (err) return console.error('出错啦::', err);
                 res.send({
@@ -62,7 +61,7 @@ router.post('/addOrUpdate', function(req, res, next) {
         
     }else{ // 更新
         DictionaryModel.findByIdAndUpdate(_id, { $set: { 
-            label, type, value
+            label, type
         }}, { new: true }, function(err, updateDictionary){
             if (err) return console.error('出错啦::', err);
             res.send({
@@ -86,7 +85,7 @@ router.post('/delete', function(req, res, next) {
     }
     DictionaryModel.findByIdAndDelete(_id)
     .then(delDictionary =>{
-        const { userId, label } = delDictionary;
+        const { userId, value } = delDictionary;
         res.send({
             code: '1',
             data: delDictionary,
@@ -95,10 +94,9 @@ router.post('/delete', function(req, res, next) {
         // 如果删除的是文章相关的，则应该清空对应的分类的文章 这里应该使用关联查询
         ArticleModel.deleteMany({
             userId,
-            type: label,
+            type: value,
         })
         .then(delArticles => {
-            console.log('xxxxx', delArticles);
         })
     })
     .catch(err =>{

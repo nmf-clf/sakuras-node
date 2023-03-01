@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-02-28 14:46:38
+ * @LastEditTime: 2023-03-01 14:20:08
  */
 var express = require('express');
 var router = express.Router();
@@ -81,7 +81,7 @@ router.post('/detail', function(req, res, next) {
 
 // 新增文章
 router.post('/addOrUpdate', function(req, res, next) {
-    let { _id, userId, username, title, type, content, status='已发布', tag=[], hot=0, good=0, index } = req.body;
+    let { _id, userId, username, title, type, typeName, content, status='已发布', tag=[], hot=0, good=0, index } = req.body;
     const currentDate = Utils.moment().currentDate();
     if(!_id && (!username || !title || !userId)){
         return res.send({
@@ -96,6 +96,7 @@ router.post('/addOrUpdate', function(req, res, next) {
             username, 
             title,  
             type,  
+            typeName,
             content, 
             createDate: currentDate, 
             updateDate: currentDate, 
