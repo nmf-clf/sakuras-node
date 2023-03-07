@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-01 15:12:09
+ * @LastEditTime: 2023-03-07 17:50:40
  */
 var express = require('express');
 var router = express.Router();
@@ -61,14 +61,21 @@ router.post('/addOrUpdate', function(req, res, next) {
         
     }else{ // 更新
         DictionaryModel.findByIdAndUpdate(_id, { $set: { 
-            label, type
+            label
         }}, { new: true }, function(err, updateDictionary){
             if (err) return console.error('出错啦::', err);
-            res.send({
-                code: '1',
-                data: updateDictionary || {},
-                message: '字典更新成功！'
-            });
+            ArticleModel.updateMany({
+                type: updateDictionary.value
+            }, { $set: { 
+                typeName: label
+            }})
+            .then(updateres => {
+                res.send({
+                    code: '1',
+                    data: updateDictionary || {},
+                    message: '字典更新成功！'
+                });
+            })
         });
     }
 });
@@ -134,6 +141,50 @@ router.post('/resetIndex', function(req, res, next) {
             data: {},
             message: '字典更新成功！'
         });
+    })
+});
+
+// 查询字典-分组
+router.post('/group', function(req, res, next) {
+    const { userId } = req.body; 
+    let query = {
+        userId: userId ? userId : '63feff45423162c275398abf' // 如果传了 userId ，则表示只查询用户私有信息
+    }
+    //查询该用户
+    let options = {
+        page: 1,
+        limit: 1000,
+        model: DictionaryModel,
+        query,
+        projection: '', 
+    }
+    pagination(options)
+    .then((result)=>{
+        const dictionList = Utils.transData(JSON.parse(JSON.stringify(result.list)), '_id', 'pid', 'children'); // 字典表
+        ArticleModel.find(query)
+        .then(articles =>{
+            let cateEnum = {}, tagEnum = {}; // 分类枚举对象 标签枚举对象
+            articles?.forEach((item) => {
+                cateEnum[item.typeName] ? cateEnum[item.typeName]++ : cateEnum[item.typeName] = 1; // 处理分类类型
+                item.tag?.forEach((type) => { tagEnum[type] ? tagEnum[type]++ : tagEnum[type] = 1 }); // 处理文章类型
+            })
+            const tagNumInfo = Utils.createArrByObject(tagEnum);
+            const cateNumInfo = Utils.createArrByObject(cateEnum);
+            res.send({
+                code: '1',
+                data: {
+                    dictionList,
+                    cateNumInfo,
+                    tagNumInfo,
+                },
+                message: '查询成功！'
+            })
+        })
+        // res.send({
+        //     code: '1',
+        //     data: newRes,
+        //     message: '查询成功！'
+        // })
     })
 });
 

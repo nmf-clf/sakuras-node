@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-29 14:04:02
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-01 15:25:15
+ * @LastEditTime: 2023-03-07 17:43:26
  */
 const NodeRSA = require('node-rsa');
 const CryptoJS = require("crypto-js");
@@ -117,8 +117,7 @@ class _Utils{
         return !val || JSON.stringify(val) === '{}' || JSON.stringify(val) === '[]' || JSON.stringify(val) === 'null'
     }
     // 生成随机数
-     // 生成随机数 
-     randomString = (len, type) => {
+    randomString = (len, type) => {
         len = len || 32;
         let $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
         type == 'number' ? $chars = '1234567890' : null;
@@ -128,6 +127,16 @@ class _Utils{
             pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
         }
         return pwd;
+    }
+    // 根据对象创建数组 objEnum: 枚举对象
+    createArrByObject = (objEnum) => {
+        if(this.isEmpty(objEnum)) return [];
+        return Object.keys(objEnum).map((type) => { 
+            return { 
+                type: type, 
+                num: objEnum[type] 
+            } 
+        })
     }
 }
 
