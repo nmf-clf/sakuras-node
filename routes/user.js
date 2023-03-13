@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-01 15:26:32
+ * @LastEditTime: 2023-03-08 09:53:02
  */
 var express = require('express');
 var router = express.Router();
@@ -82,11 +82,12 @@ router.post('/login', function(req, res, next) {
         UserModel.findOne({ username, password })
         .then(user =>{
             if(user){
-                const { username, password, age, nickname, emai, adress, school, schedule } = user;
+                delete user._doc?.password;
                 let encrypt = Utils.encrypt.DynamicDES(JSON.stringify({
                     ...user._doc,
-                    token: 'test-----------token'
+                    token: 'eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJpYXQiOjE2NzgyNDAzNTYsInN1YiI6IjkiLCJjZnZPSHk0dEhlTHplLjFhRjRYQ3NyNTdJa1NlV21oVHpZN1NYVVVINlNOY08iLCJjdXN0b21lcklkIjo5LCJ0ZWxlcGhvbmUiOiIxMzkxODkwMTAwMSIsImV4cCI6MTcwOTc3NjM1NiwibmJmIjoxNjc4MjQwMzU2fQ.jbWdYHI1bcIn8OQh98rAlhYANBgi1lUV-I1QibbpWMI'
                 }), sid);
+                console.log('xx', encrypt);
                 res.send({
                     code: '1',
                     data: encrypt,
