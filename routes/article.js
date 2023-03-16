@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-01 14:20:08
+ * @LastEditTime: 2023-03-16 17:29:32
  */
 var express = require('express');
 var router = express.Router();
@@ -76,6 +76,11 @@ router.post('/detail', function(req, res, next) {
                 message: article ? '查询成功！' : '文章详情暂无数据！'
             })
         })
+        ArticleModel.findByIdAndUpdate(_id, { $set: { // 暂时这样写，并不规范
+           hot: article.hot + 1
+        }}, { new: true }, function(err, updateArticle){
+            if (err) return console.error('出错啦::', err);
+        });
     })
 });
 

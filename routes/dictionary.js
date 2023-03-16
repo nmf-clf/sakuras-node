@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-07 17:50:40
+ * @LastEditTime: 2023-03-16 16:58:41
  */
 var express = require('express');
 var router = express.Router();
@@ -168,8 +168,17 @@ router.post('/group', function(req, res, next) {
                 cateEnum[item.typeName] ? cateEnum[item.typeName]++ : cateEnum[item.typeName] = 1; // 处理分类类型
                 item.tag?.forEach((type) => { tagEnum[type] ? tagEnum[type]++ : tagEnum[type] = 1 }); // 处理文章类型
             })
+            let cateList = dictionList.filter(v => v.type == 'articleType')[0]?.children || [];
+            let tagList = dictionList.filter(v => v.type == 'articleTag')[0]?.children || [];
+            // 如果此类别没有文章，也应该把此类别加上去
+            cateList.map(v => {
+                if(!cateEnum.hasOwnProperty(v.label)) cateEnum[v.label] = 0;
+            })
+            tagList.map(v => {
+                if(!tagEnum.hasOwnProperty(v.label)) tagEnum[v.label] = 0;
+            })
+            const cateNumInfo = Utils.createArrByObject(cateEnum, cateList);
             const tagNumInfo = Utils.createArrByObject(tagEnum);
-            const cateNumInfo = Utils.createArrByObject(cateEnum);
             res.send({
                 code: '1',
                 data: {

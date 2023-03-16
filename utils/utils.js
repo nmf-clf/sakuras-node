@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-29 14:04:02
  * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-07 17:43:26
+ * @LastEditTime: 2023-03-16 13:54:34
  */
 const NodeRSA = require('node-rsa');
 const CryptoJS = require("crypto-js");
@@ -129,12 +129,13 @@ class _Utils{
         return pwd;
     }
     // 根据对象创建数组 objEnum: 枚举对象
-    createArrByObject = (objEnum) => {
+    createArrByObject = (objEnum, arr) => {
         if(this.isEmpty(objEnum)) return [];
         return Object.keys(objEnum).map((type) => { 
             return { 
                 type: type, 
-                num: objEnum[type] 
+                num: objEnum[type],
+                value: arr ? (arr.filter(v => v.label == type)[0] || {}).value : type
             } 
         })
     }
