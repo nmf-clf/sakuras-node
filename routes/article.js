@@ -1,23 +1,24 @@
 /*
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
- * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-16 17:29:32
+ * @LastEditors: niumengfei 870424431@qq.com
+ * @LastEditTime: 2023-03-22 17:07:13
  */
 var express = require('express');
 var router = express.Router();
 const ArticleModel = require('../models/Article');
 const UserModel = require('../models/User');
-const { Utils, pagination } = require('../utils');
+const { Utils, pagination, Const } = require('../utils');
  
 // 查询文章列表
 router.post('/list', function(req, res, next) {
-    let { username, page=1, pageSize=10, title, type, tag, createDate=[], updateDate=[], status, sortByIndex } = req.body;
+    let { notlogin, username, page=1, pageSize=10, title, type, tag, createDate=[], updateDate=[], status, sortByIndex } = req.body;
+    username = notlogin ? Const.rootName : username;
     if(!username){
         return res.send({
             code: '0',
             data: null,
-            message: '用户列表查询失败: username 不能为空！'
+            message: '文章列表查询失败: username 不能为空！'
         })
     }
     //查询该用户
@@ -26,13 +27,13 @@ router.post('/list', function(req, res, next) {
         limit: pageSize,
         model: ArticleModel, //操作的数据模型
         query: {
-            username, 
+            username,
             title, 
-            type: type == '全部' ? '' : type, 
-            status: status == '全部' ? '' : status,
-            tag, 
-            createDate: Utils.isEmpty(createDate) ? null : { "$gte": createDate[0], "$lte": createDate[1] },
-            updateDate: Utils.isEmpty(updateDate) ? null : { "$gte": updateDate[0], "$lte": updateDate[1] },
+            type: type == '全部' ? null : type, 
+            status: status == '全部' ? null : status,
+            tag: Utils.isEmpty(tag) ? null : { $in: tag }, 
+            createDate: Utils.isEmpty(createDate) ? null : { $gte: createDate[0], $lte: createDate[1] },
+            updateDate: Utils.isEmpty(updateDate) ? null : { $gte: updateDate[0], $lte: updateDate[1] },
         }, //查询条件
         projection: '', //投影，
         sort: { _id: -1 } //排序
