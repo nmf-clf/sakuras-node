@@ -1,8 +1,8 @@
 /*
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
- * @LastEditors: niumengfei
- * @LastEditTime: 2023-03-16 16:58:41
+ * @LastEditors: niumengfei 870424431@qq.com
+ * @LastEditTime: 2023-03-28 09:48:39
  */
 var express = require('express');
 var router = express.Router();
@@ -165,8 +165,10 @@ router.post('/group', function(req, res, next) {
         .then(articles =>{
             let cateEnum = {}, tagEnum = {}; // 分类枚举对象 标签枚举对象
             articles?.forEach((item) => {
-                cateEnum[item.typeName] ? cateEnum[item.typeName]++ : cateEnum[item.typeName] = 1; // 处理分类类型
-                item.tag?.forEach((type) => { tagEnum[type] ? tagEnum[type]++ : tagEnum[type] = 1 }); // 处理文章类型
+                if(item.status == '已发布'){
+                    cateEnum[item.typeName] ? cateEnum[item.typeName]++ : cateEnum[item.typeName] = 1; // 处理分类类型
+                    item.tag?.forEach((type) => { tagEnum[type] ? tagEnum[type]++ : tagEnum[type] = 1 }); // 处理文章类型
+                }
             })
             let cateList = dictionList.filter(v => v.type == 'articleType')[0]?.children || [];
             let tagList = dictionList.filter(v => v.type == 'articleTag')[0]?.children || [];

@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei 870424431@qq.com
- * @LastEditTime: 2023-03-22 17:07:13
+ * @LastEditTime: 2023-03-28 09:44:55
  */
 var express = require('express');
 var router = express.Router();
@@ -13,7 +13,7 @@ const { Utils, pagination, Const } = require('../utils');
 // 查询文章列表
 router.post('/list', function(req, res, next) {
     let { notlogin, username, page=1, pageSize=10, title, type, tag, createDate=[], updateDate=[], status, sortByIndex } = req.body;
-    username = notlogin ? Const.rootName : username;
+    username = username || (notlogin && Const.rootName); // 是否默认查询 开发者 的数据列表
     if(!username){
         return res.send({
             code: '0',
@@ -29,20 +29,20 @@ router.post('/list', function(req, res, next) {
         query: {
             username,
             title, 
-            type: type == '全部' ? null : type, 
-            status: status == '全部' ? null : status,
+            type, 
+            status: sortByIndex ? null : (status || '已发布'), // 目前 sortByIndex 仅表示发布编辑文章页面需要的入参
             tag: Utils.isEmpty(tag) ? null : { $in: tag }, 
             createDate: Utils.isEmpty(createDate) ? null : { $gte: createDate[0], $lte: createDate[1] },
             updateDate: Utils.isEmpty(updateDate) ? null : { $gte: updateDate[0], $lte: updateDate[1] },
         }, //查询条件
         projection: '', //投影，
-        sort: { _id: -1 } //排序
+        sort: { _id: -1 } // 排序 默认按照倒叙来，展示最新的
     }
     pagination(options)
     .then((result)=>{
         let _res = result;
-        if(sortByIndex || (type && type !== '全部')){ // 指定通过 index 或者 查询非全部数据时，要自动根据 index 排序
-            let rlt = JSON.parse(JSON.stringify({result}));
+        if(sortByIndex){ // 指定通过 index 或者 查询非全部数据时，要自动根据 index 排序   || (type && type !== '全部')
+            let rlt = JSON.parse(JSON.stringify({ result }));
             rlt?.result?.list?.sort((a,b)=> a.index - b.index);
             _res = rlt.result;
         }
@@ -89,6 +89,7 @@ router.post('/detail', function(req, res, next) {
 router.post('/addOrUpdate', function(req, res, next) {
     let { _id, userId, username, title, type, typeName, content, status='已发布', tag=[], hot=0, good=0, index } = req.body;
     const currentDate = Utils.moment().currentDate();
+    const currentStamp =  new Date().getTime();
     if(!_id && (!username || !title || !userId)){
         return res.send({
             code: '0',
@@ -105,7 +106,9 @@ router.post('/addOrUpdate', function(req, res, next) {
             typeName,
             content, 
             createDate: currentDate, 
+            createDateStamp: currentStamp,
             updateDate: currentDate, 
+            updateDateStamp: currentStamp,
             status,
             tag,
             hot,
@@ -126,6 +129,7 @@ router.post('/addOrUpdate', function(req, res, next) {
             type,  
             content, 
             updateDate: currentDate, 
+            updateDateStamp: currentStamp,
             status,
             tag,
             hot,
