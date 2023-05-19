@@ -2,7 +2,7 @@
  * @Author: niumengfei
  * @Date: 2022-10-26 18:01:07
  * @LastEditors: niumengfei 870424431@qq.com
- * @LastEditTime: 2023-03-28 09:44:55
+ * @LastEditTime: 2023-03-31 14:34:44
  */
 var express = require('express');
 var router = express.Router();
@@ -36,7 +36,7 @@ router.post('/list', function(req, res, next) {
             updateDate: Utils.isEmpty(updateDate) ? null : { $gte: updateDate[0], $lte: updateDate[1] },
         }, //查询条件
         projection: '', //投影，
-        sort: { _id: -1 } // 排序 默认按照倒叙来，展示最新的
+        sort: { createDate: -1, _id: -1 } // 优先按照创建日期排序，其次相同创建日期按照 _id 插入顺序排序
     }
     pagination(options)
     .then((result)=>{
