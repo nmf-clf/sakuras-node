@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start:sakuras": "env PORT=5555 dbPath=pro ENV=pro node-dev ./bin/www",
-    "start:local": "env PORT=5555 dbPath=dev ENV=dev node-dev ./bin/www"
+    "start:sakuras": "cross-env PORT=5555 dbPath=pro ENV=pro node-dev ./bin/www",
+    "start:local": "cross-env PORT=5555 dbPath=dev ENV=dev node-dev ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -24,6 +24,7 @@
     "pro": "124.223.5.128:27017/sakuras"
   },
   "devDependencies": {
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "cross-env": "^7.0.3"
   }
 }
